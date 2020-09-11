@@ -48,7 +48,7 @@ async def main():
         config.homeserver_url,
         config.user_id,
         device_id=config.device_id,
-        store_path=config.store_path,
+        store_path=config.store_filepath,
         config=client_config,
     )
 

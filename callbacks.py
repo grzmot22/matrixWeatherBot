@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Callbacks(object):
 
-    def __init__(self, client, store, config, plugin_loader):
+    def __init__(self, client, store, config):
         """
         Args:
             client (nio.AsyncClient): nio client used to interact with matrix
@@ -49,7 +49,7 @@ class Callbacks(object):
             has_command_prefix = split_message.startswith(self.command_prefix)
             if not has_command_prefix and not room.is_group:
                 # General message listener
-                message = Message(self.client, self.store, self.config, split_message, room, event, self.plugin_loader)
+                message = Message(self.client, self.store, self.config, split_message, room, event)
                 await message.process()
                 continue
 
@@ -62,7 +62,7 @@ class Callbacks(object):
                 split_message = split_message.lstrip()
 
             if split_message != "":
-                command = Command(self.client, self.store, self.config, split_message, room, event, self.plugin_loader)
+                command = Command(self.client, self.store, self.config, split_message, room, event)
                 await command.process()
 
     async def event_unknown(self, room: MatrixRoom, event: UnknownEvent):
@@ -72,9 +72,6 @@ class Callbacks(object):
         :param event: nio.events.room_events.RoomMessage: The event defining the message
         :return:
         """
-
-        if event.type == "m.reaction":
-            await self.plugin_loader.run_hooks(self.client, event.type, room, event)
 
     async def invite(self, room, event):
         """Callback for when an invite is received. Join the room specified in the invite"""

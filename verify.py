@@ -69,7 +69,7 @@ async def main_verify() -> None:
     )
 
     # Set up event callbacks
-    callbacks = Callbacks(client)
+    callbacks = Callbacks(client, store, config)
     client.add_to_device_callback(
         callbacks.to_device_callback, (KeyVerificationEvent,)
     )
@@ -131,30 +131,6 @@ async def main_verify() -> None:
             # Make sure to close the client connection on disconnect
             await client.close()
 
-
-# according to pylama: function too complex: C901 # noqa: C901
-def initial_check_of_args() -> None:  # noqa: C901
-    """Check arguments."""
-    # First, the adjustments
-    if not pargs.encrypted:
-        pargs.encrypted = True  # force it on
-        logger.debug("Encryption is always enabled. It cannot be turned off.")
-    if not pargs.encrypted:  # just in case we ever go back disabling e2e
-        pargs.store = None
-    elif pargs.verify and (pargs.verify.lower() != EMOJI):
-        t = f'For --verify currently only "{EMOJI}" is allowed ' "as keyword."
-    elif pargs.verify:
-        t = (
-            "If --verify is specified, only verify can be done. "
-            "No messages, images, or files can be sent."
-            "No listening or tailing allowed. No renaming."
-        )   
-    else:
-        logger.debug("All arguments are valid. All checks passed.")
-        return
-    logger.error(t)
-    sys.exit(1)
-
 if __name__ == "__main__": 
     logging.basicConfig()  # initialize root logger, a must
     # set log level on root
@@ -178,13 +154,6 @@ if __name__ == "__main__":
     )
     # Add the arguments to the parser
     ap.add_argument(
-        "-d",
-        "--debug",
-        required=False,
-        action="store_true",
-        help="Print debug information",
-    )
-    ap.add_argument(
         "-v",
         "--verify",
         required=False,
@@ -207,13 +176,6 @@ if __name__ == "__main__":
     )
  
     pargs = ap.parse_args()
-    if pargs.debug:
-        # set log level on root logger
-        logging.getLogger().setLevel(logging.DEBUG)
-        logging.getLogger().info("Debug is turned on.")
-    logger = logging.getLogger(__name__)
-
-    initial_check_of_args()
 
     try:
         if pargs.verify:

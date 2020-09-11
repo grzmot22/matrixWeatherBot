@@ -35,6 +35,7 @@ class Callbacks(object):
         self.store = store
         self.config = config
         self.command_prefix = config.command_prefix
+        
     async def to_device_callback(self, event):
         """Handle events sent to device."""
         try:

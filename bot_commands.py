@@ -2,6 +2,16 @@
 from chat_functions import send_text_to_room
 import logging
 
+#import needed for bme280 sensor
+import smbus2
+import bme280
+
+# setup sensor bme280
+port = 1
+address = 0x76
+bus = smbus2.SMBus(port)
+calibration_params = bme280.load_calibration_params(bus, address)
+
 logger = logging.getLogger(__name__)
 
 class Command(object):
@@ -39,7 +49,7 @@ class Command(object):
         elif trigger.startswith("help"):
             await self._show_help()
         elif trigger.startswith("weather"):
-            await self._weather_bme280()
+            await self._show_weather_bme280()
         else:
             await self._unknown_command()
 
@@ -66,6 +76,14 @@ class Command(object):
         else:
             text = "Unknown help topic!"
         await send_text_to_room(self.client, self.room.room_id, text)
+
+    async def _show_weather_bme280(self):
+        data = bme280.sample(bus, address, calibration_params)
+        await send_text_to_room(
+            self.client,
+            self.room.room_id,
+            f"Current temperature '{data.temperature}', pressure: '{data.pressure}' and  humidity '{data.humidity}'",
+        )
 
     async def _unknown_command(self):
         await send_text_to_room(

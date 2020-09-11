@@ -36,6 +36,7 @@ from nio import (
 
 client: AsyncClient
 timestamp: float = time()
+logger = logging.getLogger(__name__)
 
 EMOJI = "emoji"  # verification type
 VERIFY_UNUSED_DEFAULT = None  # use None if --verify is not specified

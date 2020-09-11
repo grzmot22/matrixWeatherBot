@@ -1,6 +1,7 @@
 
 from chat_functions import send_text_to_room
 import logging
+from decimal import Decimal
 
 #import needed for bme280 sensor
 import smbus2
@@ -82,7 +83,7 @@ class Command(object):
         await send_text_to_room(
             self.client,
             self.room.room_id,
-            f"Current temperature '{data.temperature}', pressure: '{data.pressure}' and  humidity '{data.humidity}'",
+            f"Current temperature {round(Decimal(data.temperature))} C, pressure: '{round(Decimal(data.pressure))}HPa and  humidity {round(Decimal(data.humidity))}%",
         )
 
     async def _unknown_command(self):

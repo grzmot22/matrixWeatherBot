@@ -20,7 +20,6 @@ from aiohttp.client_exceptions import (
 
 logger = logging.getLogger(__name__)
 client: AsyncClient
-plugin_loader: PluginLoader
 timestamp: float = time()
 
 
@@ -29,7 +28,6 @@ timestamp: float = time()
 async def main():
 
     global client
-    global plugin_loader
 
     # Read config file
     config = Config("config.yaml")
@@ -50,7 +48,7 @@ async def main():
         config.homeserver_url,
         config.user_id,
         device_id=config.device_id,
-        store_path=config.store_filepath,
+        store_path=config.store_path,
         config=client_config,
     )
 

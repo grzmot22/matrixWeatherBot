@@ -31,7 +31,7 @@ storage:
   database_filepath: "bot.db"
   # The path to a directory for internal bot storage
   # containing encryption keys, sync tokens, etc.
-  store_filepath: "./store"
+  store_path: "./store"
 
 # Logging setup
 logging:

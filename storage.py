@@ -1,3 +1,4 @@
+
 import sqlite3
 import os.path
 import logging
@@ -32,12 +33,10 @@ class Storage(object):
         self.cursor = self.conn.cursor()
 
         # Sync token table
-        self.cursor.execute(
-            "CREATE TABLE sync_token ("
-            "dedupe_id INTEGER PRIMARY KEY, "
-            "token TEXT NOT NULL"
-            ")"
-        )
+        self.cursor.execute("CREATE TABLE sync_token ("
+                            "dedupe_id INTEGER PRIMARY KEY, "
+                            "token TEXT NOT NULL"
+                            ")")
 
         logger.info("Database setup complete")
 

@@ -3,27 +3,35 @@
 # Default values are shown
 
 # The string to prefix messages with to talk to the bot in group chats
-command_prefix: "!v"
-
-# Only accept invites from these matrix IDs. Leave empty to allow anyone.
-invite_whitelist: []
-# Only accept specific commands from these matrix IDs. Leave empty to allow anyone.
-admin_whitelist: []
+command_prefix: "!c"
 
 # Options for connecting to the bot's Matrix account
 matrix:
   # The Matrix User ID of the bot account
   user_id: "@bot:example.com"
-  # The access token of the bot account
-  access_token: ""
-  # The device ID given on login
-  device_id: ABCDEFGHIJ
+  # Matrix account password
+  user_password: ""
   # The URL of the homeserver to connect to
   homeserver_url: https://example.com
+  # The device ID that is **non pre-existing** device
+  # If this device ID already exists, messages will be dropped silently in encrypted rooms
+  device_id: ABCDEFGHIJ
+  # What to name the logged in device
+  device_name: nio-template
+  # End-to-end encryption support
+  #
+  # Enabling this requires installing the matrix-nio encryption dependencies
+  # as described here: https://github.com/poljar/matrix-nio#installation
+  enable_encryption: true
+  # Define matrix-accounts eligible for certain actions
+  botmasters: "[@botmaster:matrix.server,@anotherbotmaster:matrix.server]"
 
-database:
+storage:
   # The path to the database
-  filepath: "/opt/data/bot.db"
+  database_filepath: "bot.db"
+  # The path to a directory for internal bot storage
+  # containing encryption keys, sync tokens, etc.
+  store_filepath: "./store"
 
 # Logging setup
 logging:
@@ -35,7 +43,7 @@ logging:
     # Whether logging to a file is enabled
     enabled: false
     # The path to the file to log to. May be relative or absolute
-    filepath: "/opt/data/bot.log"
+    filepath: bot.log
   # Configure logging to the console output
   console_logging:
     # Whether logging to the console is enabled

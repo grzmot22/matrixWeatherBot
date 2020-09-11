@@ -1,9 +1,12 @@
 import logging
-import re
 import os
-import yaml
+import re
 import sys
-from errors import ConfigError
+from typing import Any, List
+
+import yaml
+
+import ConfigError
 
 logger = logging.getLogger()
 
@@ -19,80 +22,100 @@ class Config(object):
 
         # Load in the config file at the given filepath
         with open(filepath) as file_stream:
-            config = yaml.full_load(file_stream.read())
+            self.config = yaml.safe_load(file_stream.read())
 
         # Logging setup
         formatter = logging.Formatter(
             "%(asctime)s | %(name)s [%(levelname)s] %(message)s"
         )
 
-        log_dict = config.get("logging", {})
-        log_level = log_dict.get("level", "INFO")
+        log_level = self._get_cfg(["logging", "level"], default="INFO")
         logger.setLevel(log_level)
 
-        file_logging = log_dict.get("file_logging", {})
-        file_logging_enabled = file_logging.get("enabled", False)
-        file_logging_filepath = file_logging.get("filepath", "bot.log")
+        file_logging_enabled = self._get_cfg(
+            ["logging", "file_logging", "enabled"], default=False
+        )
+        file_logging_filepath = self._get_cfg(
+            ["logging", "file_logging", "filepath"], default="bot.log"
+        )
         if file_logging_enabled:
             handler = logging.FileHandler(file_logging_filepath)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
-        console_logging = log_dict.get("console_logging", {})
-        console_logging_enabled = console_logging.get("enabled", True)
+        console_logging_enabled = self._get_cfg(
+            ["logging", "console_logging", "enabled"], default=True
+        )
         if console_logging_enabled:
             handler = logging.StreamHandler(sys.stdout)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
+        # Storage setup
+        self.store_path = self._get_cfg(["storage", "store_path"], required=True)
+
+        # Create the store folder if it doesn't exist
+        if not os.path.isdir(self.store_path):
+            if not os.path.exists(self.store_path):
+                os.mkdir(self.store_path)
+            else:
+                raise ConfigError(
+                    f"storage.store_path '{self.store_path}' is not a directory"
+                )
+
         # Database setup
-        database_dict = config.get("database", {})
-        self.database_filepath = database_dict.get("filepath")
+        database_path = self._get_cfg(["storage", "database"], required=True)
 
-        # Whitelist setups
-        self.invite_whitelist = config.get("invite_whitelist")
-        if not type(self.invite_whitelist) == list:
-            raise ConfigError(
-                "Leave the list empty if the invite whitelist should be disabled."
-            )
-        elif not self.invite_whitelist:
-            self.invite_whitelist_enabled = False
+        # Support both SQLite and Postgres backends
+        # Determine which one the user intends
+        sqlite_scheme = "sqlite://"
+        postgres_scheme = "postgres://"
+        if database_path.startswith(sqlite_scheme):
+            self.database = {
+                "type": "sqlite",
+                "connection_string": database_path[len(sqlite_scheme) :],
+            }
+        elif database_path.startswith(postgres_scheme):
+            self.database = {"type": "postgres", "connection_string": database_path}
         else:
-            self.invite_whitelist_enabled = True
-
-        self.admin_whitelist = config.get("admin_whitelist")
-        if not type(self.admin_whitelist) == list:
-            raise ConfigError(
-                "Leave the list empty if the admin whitelist should be disabled."
-            )
-        elif not self.admin_whitelist:
-            self.admin_whitelist_enabled = False
-        else:
-            self.admin_whitelist_enabled = True
+            raise ConfigError("Invalid connection string for storage.database")
 
         # Matrix bot account setup
-        matrix = config.get("matrix", {})
-
-        self.user_id = matrix.get("user_id")
-        if not self.user_id:
-            raise ConfigError("matrix.user_id is a required field")
-        elif not re.match("@.*:.*", self.user_id):
+        self.user_id = self._get_cfg(["matrix", "user_id"], required=True)
+        if not re.match("@.*:.*", self.user_id):
             raise ConfigError("matrix.user_id must be in the form @name:domain")
 
-        self.access_token = matrix.get("access_token")
-        if not self.access_token:
-            raise ConfigError("matrix.access_token is a required field")
+        self.user_password = self._get_cfg(["matrix", "user_password"], required=True)
+        self.device_id = self._get_cfg(["matrix", "device_id"], required=True)
+        self.device_name = self._get_cfg(
+            ["matrix", "device_name"], default="nio-template"
+        )
+        self.homeserver_url = self._get_cfg(["matrix", "homeserver_url"], required=True)
 
-        self.device_id = matrix.get("device_id")
-        if not self.device_id:
-            logger.warning(
-                "matrix.device_id is not provided, which means "
-                "that encryption won't work correctly"
-            )
+        self.command_prefix = self._get_cfg(["command_prefix"], default="!c") + " "
 
-        self.homeserver_url = matrix.get("homeserver_url")
-        if not self.homeserver_url:
-            raise ConfigError("matrix.homeserver_url is a required field")
+    def _get_cfg(
+        self, path: List[str], default: Any = None, required: bool = True,
+    ) -> Any:
+        """Get a config option from a path and option name, specifying whether it is
+        required.
+        Raises:
+            ConfigError: If required is specified and the object is not found
+                (and there is no default value provided), this error will be raised
+        """
+        # Sift through the the config until we reach our option
+        config = self.config
+        for name in path:
+            config = config.get(name)
 
-        self.command_prefix = config.get("command_prefix", "!c") + " "
- 
+            # If at any point we don't get our expected option...
+            if config is None:
+                # Raise an error if it was required
+                if required or not default:
+                    raise ConfigError(f"Config option {'.'.join(path)} is required")
+
+                # or return the default value
+                return default
+
+        # We found the option. Return it
+        return config

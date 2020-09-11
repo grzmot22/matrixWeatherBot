@@ -16,8 +16,8 @@ class Command(object):
         """
         self.client = client
         self.store = store
-        self.command = command
         self.config = config
+        self.command = command
         self.room = room
         self.event = event
         self.args = self.command.split()[1:]
@@ -29,9 +29,7 @@ class Command(object):
         elif self.command.startswith("help"):
             await self._show_help()
         elif self.command.startswith("weather"):
-            await self._pihole_stats()
-        elif self.command.startswith("verify"):
-            await self._utrobot_stats()
+            await self._weather_bme280()
         else:
             await self._unknown_command()
 
@@ -63,5 +61,5 @@ class Command(object):
         await send_text_to_room(
             self.client,
             self.room.room_id,
-            f"I don't know '{self.command}'. Please try again.",
+            f"Unknown command '{self.command}'. Try the 'help' command for more information.",
         )

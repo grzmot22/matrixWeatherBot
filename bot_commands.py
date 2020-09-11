@@ -1,17 +1,24 @@
-from chat_functions import send_text_to_room
-import requests
-import json
 
+from chat_functions import send_text_to_room
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Command(object):
     def __init__(self, client, store, config, command, room, event):
         """A command made by a user
+
         Args:
             client (nio.AsyncClient): The client to communicate to matrix with
+
             store (Storage): Bot storage
+
             config (Config): Bot configuration parameters
+
             command (str): The command and arguments
+
             room (nio.rooms.MatrixRoom): The room the command was sent in
+
             event (nio.events.room_events.RoomMessageText): The event describing the command
         """
         self.client = client
@@ -22,13 +29,16 @@ class Command(object):
         self.event = event
         self.args = self.command.split()[1:]
 
+
     async def process(self):
         """Process the command"""
-        if self.command.startswith("echo"):
+        logger.debug("Got command from %s: %r", self.event.sender, self.command)
+        trigger = self.command.lower().split(maxsplit=1)[0]
+        if trigger.startswith("echo"):
             await self._echo()
-        elif self.command.startswith("help"):
+        elif trigger.startswith("help"):
             await self._show_help()
-        elif self.command.startswith("weather"):
+        elif trigger.startswith("weather"):
             await self._weather_bme280()
         else:
             await self._unknown_command()

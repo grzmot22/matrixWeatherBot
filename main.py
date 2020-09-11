@@ -18,6 +18,7 @@ from aiohttp.client_exceptions import (
     ServerDisconnectedError,
     ClientConnectionError)
 
+
 logger = logging.getLogger(__name__)
 client: AsyncClient
 timestamp: float = time()
@@ -40,7 +41,7 @@ async def main():
         max_limit_exceeded=0,
         max_timeouts=0,
         store_sync_tokens=True,
-        encryption_enabled=True,
+        encryption_enabled=config.enable_encryption,
     )
 
     # Initialize the matrix client
@@ -51,6 +52,7 @@ async def main():
         store_path=config.store_filepath,
         config=client_config,
     )
+
 
     # Set up event callbacks
     callbacks = Callbacks(client, store, config)

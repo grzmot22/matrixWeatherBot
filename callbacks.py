@@ -6,6 +6,7 @@ from message_responses import Message
 
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,7 +16,9 @@ class Callbacks(object):
         """
         Args:
             client (nio.AsyncClient): nio client used to interact with matrix
+
             store (Storage): Bot storage
+
             config (Config): Bot configuration parameters
         """
         self.client = client
@@ -25,9 +28,12 @@ class Callbacks(object):
 
     async def message(self, room, event):
         """Callback for when a message event is received
+
         Args:
             room (nio.rooms.MatrixRoom): The room the event came from
+
             event (nio.events.room_events.RoomMessageText): The event defining the message
+
         """
         # Extract the message text
         msg = event.body
@@ -43,7 +49,10 @@ class Callbacks(object):
 
         # process each line as separate message to check for commands
         messages = msg.split("\n\n")
-
+        logger.debug(
+            f"Bot message received for prefix {self.command_prefix} | "
+            f"{room.user_name(event.sender)}: {messages}"
+        )
         for split_message in messages:
             # Process as message if in a public room without command prefix
             has_command_prefix = split_message.startswith(self.command_prefix)

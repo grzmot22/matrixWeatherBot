@@ -73,7 +73,7 @@ class Command(object):
         if topic == "rules":
             text = "These are the rules!"
         elif topic == "commands":
-            text = "Available commands"
+            text = "Available commands: weather, echo"
         else:
             text = "Unknown help topic!"
         await send_text_to_room(self.client, self.room.room_id, text)

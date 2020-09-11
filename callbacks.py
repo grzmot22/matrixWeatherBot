@@ -184,17 +184,13 @@ class Callbacks(object):
         if event.sender == self.client.user:
             return
 
-        logger.debug(
+        logger.info(
             f"Bot message received for room {room.display_name} | "
             f"{room.user_name(event.sender)}: {msg}"
         )
 
         # process each line as separate message to check for commands
         messages = msg.split("\n\n")
-        logger.debug(
-            f"Bot message received for prefix {self.command_prefix} | "
-            f"{room.user_name(event.sender)}: {messages}"
-        )
         for split_message in messages:
             # Process as message if in a public room without command prefix
             has_command_prefix = split_message.startswith(self.command_prefix)

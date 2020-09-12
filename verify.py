@@ -6,8 +6,6 @@ import logging
 import os
 import sys
 import traceback
-import logging
-import asyncio
 from time import time
 from asyncio import sleep
 from callbacks import Callbacks
@@ -142,16 +140,9 @@ if __name__ == "__main__":
 
     # Construct the argument parser
     ap = argparse.ArgumentParser(
-        description="On first run this program will configure itself. "
-        "On further runs this program implements a simple Matrix CLI client "
+        description="This program perform verification of the device. To run with -v or --verify"
         "Emoji verification is built-in which can be used "
-        "to verify devices. End-to-end encryption is enabled by default "
-        "and cannot be turned off. "
-        "matrix-nio (https://github.com/poljar/matrix-nio) and end-to-end "
-        "encryption packages must be installed. "
-        "See dependencies in source code (or README.md). For even more "
-        "explications run this program with the --help option or read the "
-        "full documentation in the source code."
+        "to verify devices."
     )
     # Add the arguments to the parser
     ap.add_argument(
@@ -159,21 +150,18 @@ if __name__ == "__main__":
         "--verify",
         required=False,
         type=str,
-        default=VERIFY_UNUSED_DEFAULT,  # when -t is not used
+        default=VERIFY_UNUSED_DEFAULT, 
         nargs="?",  # makes the word optional
         # when -v is used, but text is not added
         const=VERIFY_USED_DEFAULT,
-        help="Perform verification. By default, no "
-        "verification is performed. "
+        help="Perform verification."  
         f'Possible values are: "{EMOJI}". '
-        "If verification is desired, run this program in the "
-        "foreground (not as a service) and without a pipe. "
+        "If verification is desired, run this program in the foreground"
         "Verification questions "
-        "will be printed on stdout and the user has to respond "
+        "will be printed on terminal and the user has to respond "
         "via the keyboard to accept or reject verification. "
-        "Once verification is complete, stop the program and "
-        "run it as a service again. Don't send messages or "
-        "files when you verify. ",
+        "Once verification is complete, stop the program."
+       
     )
  
     pargs = ap.parse_args()
@@ -198,9 +186,6 @@ if __name__ == "__main__":
             "Sorry. Here is the traceback."
         )
         logger.info(traceback.format_exc())
-        # traceback.print_exc(file=sys.stdout)
     except KeyboardInterrupt:
         logger.debug("Keyboard interrupt received.")
     sys.exit(1)
-
-# EOF

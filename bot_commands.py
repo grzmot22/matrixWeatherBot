@@ -83,7 +83,7 @@ class Command(object):
         await send_text_to_room(
             self.client,
             self.room.room_id,
-            f"Current temperature {round(Decimal(data.temperature))} C, pressure: '{round(Decimal(data.pressure))}HPa and  humidity {round(Decimal(data.humidity))}%",
+            f"Current temperature {round(Decimal(data.temperature))} C, pressure {round(Decimal(data.pressure))}HPa and humidity {round(Decimal(data.humidity))}%",
         )
 
     async def _unknown_command(self):

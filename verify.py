@@ -18,18 +18,8 @@ from aiohttp.client_exceptions import (
 from nio import (
     AsyncClient,
     AsyncClientConfig,
-    KeyVerificationCancel,
     KeyVerificationEvent,
-    KeyVerificationKey,
-    KeyVerificationMac,
-    KeyVerificationStart,
-    LocalProtocolError,
-    LoginResponse,
-    ToDeviceError,
-    UpdateDeviceError,
-    RoomMessageText,
-    InviteEvent,
-    LocalProtocolError, LoginError, UnknownEvent
+    LocalProtocolError, LoginError
 )
 
 client: AsyncClient

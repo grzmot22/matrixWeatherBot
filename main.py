@@ -24,8 +24,6 @@ client: AsyncClient
 timestamp: float = time()
 
 
-
-
 async def main():
 
     global client
@@ -53,7 +51,6 @@ async def main():
         config=client_config,
     )
 
-
     # Set up event callbacks
     callbacks = Callbacks(client, store, config)
     client.add_event_callback(callbacks.message, (RoomMessageText))
@@ -73,7 +70,8 @@ async def main():
 
                 # Check if login failed
                 if type(login_response) == LoginError:
-                    logger.error(f"Failed to login: {login_response.message}, retrying in 15s... ({error_retries})")
+                    logger.error(
+                        f"Failed to login: {login_response.message}, retrying in 15s... ({error_retries})")
                     # try logging in a few times to work around temporary login errors during homeserver restarts
                     if error_retries < 3:
                         error_retries += 1
@@ -111,7 +109,8 @@ async def main():
             logger.debug("Keyboard interrupt received.")
         except (ClientConnectionError, ServerDisconnectedError, AttributeError, asyncio.TimeoutError) as err:
             logger.debug(err)
-            logger.warning(f"Unable to connect to homeserver, retrying in 15s...")
+            logger.warning(
+                f"Unable to connect to homeserver, retrying in 15s...")
 
             # Sleep so we don't bombard the server with login requests
             await sleep(15)

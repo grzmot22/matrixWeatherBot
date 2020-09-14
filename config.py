@@ -23,46 +23,59 @@ class Config(object):
             self.config = yaml.safe_load(file_stream.read())
 
         # Logging setup
-        formatter = logging.Formatter('%(asctime)s | %(name)s [%(levelname)s] %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s | %(name)s [%(levelname)s] %(message)s')
 
         log_level = self._get_cfg(["logging", "level"], default="INFO")
         logger.setLevel(log_level)
 
-        file_logging_enabled = self._get_cfg(["logging", "file_logging", "enabled"], default=False)
-        file_logging_filepath = self._get_cfg(["logging", "file_logging", "filepath"], default="bot.log")
+        file_logging_enabled = self._get_cfg(
+            ["logging", "file_logging", "enabled"], default=False)
+        file_logging_filepath = self._get_cfg(
+            ["logging", "file_logging", "filepath"], default="bot.log")
         if file_logging_enabled:
             handler = logging.FileHandler(file_logging_filepath)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
-        console_logging_enabled = self._get_cfg(["logging", "console_logging", "enabled"], default=True)
+        console_logging_enabled = self._get_cfg(
+            ["logging", "console_logging", "enabled"], default=True)
         if console_logging_enabled:
             handler = logging.StreamHandler(sys.stdout)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
         # Storage setup
-        self.database_filepath = self._get_cfg(["storage", "database_filepath"], required=True)
-        self.store_filepath = self._get_cfg(["storage", "store_filepath"], required=True)
+        self.database_filepath = self._get_cfg(
+            ["storage", "database_filepath"], required=True)
+        self.store_filepath = self._get_cfg(
+            ["storage", "store_filepath"], required=True)
 
         # Create the store folder if it doesn't exist
         if not os.path.isdir(self.store_filepath):
             if not os.path.exists(self.store_filepath):
                 os.mkdir(self.store_filepath)
             else:
-                raise ConfigError(f"storage.store_filepath '{self.store_filepath}' is not a directory")
+                raise ConfigError(
+                    f"storage.store_filepath '{self.store_filepath}' is not a directory")
 
         # Matrix bot account setup
         self.user_id = self._get_cfg(["matrix", "user_id"], required=True)
         if not re.match("@.*:.*", self.user_id):
-            raise ConfigError("matrix.user_id must be in the form @name:domain")
+            raise ConfigError(
+                "matrix.user_id must be in the form @name:domain")
 
-        self.user_password = self._get_cfg(["matrix", "user_password"], required=True)
+        self.user_password = self._get_cfg(
+            ["matrix", "user_password"], required=True)
         self.device_id = self._get_cfg(["matrix", "device_id"], required=True)
-        self.device_name = self._get_cfg(["matrix", "device_name"], default="nio-template")
-        self.homeserver_url = self._get_cfg(["matrix", "homeserver_url"], required=True)
-        self.enable_encryption = self._get_cfg(["matrix", "enable_encryption"], default=False)
-        self.botmasters = self._get_cfg(["matrix", "botmasters"], required=True)
+        self.device_name = self._get_cfg(
+            ["matrix", "device_name"], default="nio-template")
+        self.homeserver_url = self._get_cfg(
+            ["matrix", "homeserver_url"], required=True)
+        self.enable_encryption = self._get_cfg(
+            ["matrix", "enable_encryption"], default=False)
+        self.botmasters = self._get_cfg(
+            ["matrix", "botmasters"], required=True)
 
         self.command_prefix = self._get_cfg(["command_prefix"], default="!c ")
 
@@ -88,7 +101,8 @@ class Config(object):
             if config is None:
                 # Raise an error if it was required
                 if required or not default:
-                    raise ConfigError(f"Config option {'.'.join(path)} is required")
+                    raise ConfigError(
+                        f"Config option {'.'.join(path)} is required")
 
                 # or return the default value
                 return default

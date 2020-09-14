@@ -14,7 +14,7 @@ from storage import Storage
 from aiohttp.client_exceptions import (
     ServerDisconnectedError,
     ClientConnectionError)
-    
+
 from nio import (
     AsyncClient,
     AsyncClientConfig,
@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 EMOJI = "emoji"  # verification type
 VERIFY_UNUSED_DEFAULT = None  # use None if --verify is not specified
 VERIFY_USED_DEFAULT = "emoji"  # use emoji by default with --verify
+
 
 async def main_verify() -> None:
 
@@ -85,7 +86,8 @@ async def main_verify() -> None:
 
                 # Check if login failed
                 if type(login_response) == LoginError:
-                    logger.error(f"Failed to login: {login_response.message}, retrying in 15s... ({error_retries})")
+                    logger.error(
+                        f"Failed to login: {login_response.message}, retrying in 15s... ({error_retries})")
                     # try logging in a few times to work around temporary login errors during homeserver restarts
                     if error_retries < 3:
                         error_retries += 1
@@ -122,7 +124,8 @@ async def main_verify() -> None:
 
         except (ClientConnectionError, ServerDisconnectedError, AttributeError, asyncio.TimeoutError) as err:
             logger.debug(err)
-            logger.warning(f"Unable to connect to homeserver, retrying in 15s...")
+            logger.warning(
+                f"Unable to connect to homeserver, retrying in 15s...")
 
             # Sleep so we don't bombard the server with login requests
             await sleep(15)
@@ -130,7 +133,7 @@ async def main_verify() -> None:
             # Make sure to close the client connection on disconnect
             await client.close()
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     logging.basicConfig()  # initialize root logger, a must
     # set log level on root
     if "DEBUG" in os.environ:
@@ -150,26 +153,26 @@ if __name__ == "__main__":
         "--verify",
         required=False,
         type=str,
-        default=VERIFY_UNUSED_DEFAULT, 
+        default=VERIFY_UNUSED_DEFAULT,
         nargs="?",  # makes the word optional
         # when -v is used, but text is not added
         const=VERIFY_USED_DEFAULT,
-        help="Perform verification."  
+        help="Perform verification."
         f'Possible values are: "{EMOJI}". '
         "If verification is desired, run this program in the foreground"
         "Verification questions "
         "will be printed on terminal and the user has to respond "
         "via the keyboard to accept or reject verification. "
         "Once verification is complete, stop the program."
-       
+
     )
- 
+
     pargs = ap.parse_args()
 
     try:
         if pargs.verify:
             asyncio.get_event_loop().run_until_complete(main_verify())
- 
+
         logger.debug(f"The program {__name__} terminated successfully.")
     except TimeoutError:
         logger.info(

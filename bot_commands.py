@@ -3,7 +3,7 @@ from chat_functions import send_text_to_room
 import logging
 from decimal import Decimal
 
-#import needed for bme280 sensor
+# import needed for bme280 sensor
 import smbus2
 import bme280
 
@@ -14,6 +14,7 @@ bus = smbus2.SMBus(port)
 calibration_params = bme280.load_calibration_params(bus, address)
 
 logger = logging.getLogger(__name__)
+
 
 class Command(object):
     def __init__(self, client, store, config, command, room, event):
@@ -40,10 +41,10 @@ class Command(object):
         self.event = event
         self.args = self.command.split()[1:]
 
-
     async def process(self):
         """Process the command"""
-        logger.debug("Got command from %s: %r", self.event.sender, self.command)
+        logger.debug("Got command from %s: %r",
+                     self.event.sender, self.command)
         trigger = self.command.lower().split(maxsplit=1)[0]
         if trigger.startswith("echo"):
             await self._echo()

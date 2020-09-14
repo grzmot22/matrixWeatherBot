@@ -35,7 +35,7 @@ class Callbacks(object):
         self.store = store
         self.config = config
         self.command_prefix = config.command_prefix
-        
+
     async def to_device_callback(self, event):
         """Handle events sent to device."""
         try:
@@ -196,7 +196,8 @@ class Callbacks(object):
             has_command_prefix = split_message.startswith(self.command_prefix)
             if not has_command_prefix and not room.is_group:
                 # General message listener
-                message = Message(self.client, self.store, self.config, split_message, room, event)
+                message = Message(self.client, self.store,
+                                  self.config, split_message, room, event)
                 await message.process()
                 continue
 
@@ -209,7 +210,8 @@ class Callbacks(object):
                 split_message = split_message.lstrip()
 
             if split_message != "":
-                command = Command(self.client, self.store, self.config, split_message, room, event)
+                command = Command(self.client, self.store,
+                                  self.config, split_message, room, event)
                 await command.process()
 
     async def event_unknown(self, room: MatrixRoom, event: UnknownEvent):

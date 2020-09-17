@@ -49,6 +49,8 @@ async def main():
         device_id=config.device_id,
         store_path=config.store_filepath,
         config=client_config,
+        ssl=ssl,
+        proxy=proxy
     )
 
     # Set up event callbacks

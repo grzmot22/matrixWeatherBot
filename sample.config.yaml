@@ -17,7 +17,7 @@ matrix:
   # If this device ID already exists, messages will be dropped silently in encrypted rooms
   device_id: ABCDEFGHIJ
   # What to name the logged in device
-  device_name: nio-template
+  device_name: weather-bot
   # End-to-end encryption support
   #
   # Enabling this requires installing the matrix-nio encryption dependencies
@@ -25,7 +25,10 @@ matrix:
   enable_encryption: true
   # Define matrix-accounts eligible for certain actions
   botmasters: "[@botmaster:matrix.server,@anotherbotmaster:matrix.server]"
-
+  # SSL  Default value "None" When none check SSL verification. To turn off the SSL use "False"
+  ssl:None 
+  # Set up the proxy. Default value "None"
+  proxy: None
 storage:
   # The path to the database
   database_filepath: "bot.db"

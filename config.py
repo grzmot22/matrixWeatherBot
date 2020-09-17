@@ -77,7 +77,6 @@ class Config(object):
         self.botmasters = self._get_cfg(
             ["matrix", "botmasters"], required=True)
         self.ssl = self._get_cfg(["matrix", "ssl"], required=False)
-        self.proxy = self._get_cfg(["matrix", "proxy"], required=False)
         self.command_prefix = self._get_cfg(["command_prefix"], default="!c ")
 
     def _get_cfg(
